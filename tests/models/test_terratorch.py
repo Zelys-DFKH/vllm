@@ -6,8 +6,14 @@ import torch
 
 from tests.conftest import VllmRunner
 from tests.utils import create_new_process_for_each_test
+from vllm.platforms import current_platform
 
 
+@pytest.mark.skipif(
+    current_platform.is_cuda()
+    and current_platform.is_device_capability_family(100),
+    reason="Terratorch Prithvi models hit a GPU warp assert on Blackwell (SM100)",
+)
 @create_new_process_for_each_test()  # Hangs otherwise
 @pytest.mark.parametrize(
     "model",

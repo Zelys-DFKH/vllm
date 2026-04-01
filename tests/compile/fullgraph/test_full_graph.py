@@ -196,9 +196,14 @@ def test_custom_compile_config(
     "model, backend",
     [
         ("Qwen/Qwen2-0.5B", None),  # Standard attention model
-        (
+        pytest.param(
             "deepseek-ai/DeepSeek-V2-Lite",
             AttentionBackendEnum.FLASHINFER_MLA,
+            marks=pytest.mark.skipif(
+                not torch.cuda.is_available()
+                or torch.cuda.get_device_properties(0).major != 10,
+                reason="FLASHINFER_MLA requires SM100 (Blackwell)",
+            ),
         ),  # MLA (Multi-head Latent Attention) model
     ],
 )

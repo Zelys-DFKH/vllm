@@ -788,7 +788,7 @@ class FlashAttentionImpl(AttentionImpl):
                     q_descale=q_descale if self.vllm_flash_attn_version == 3 else None,
                     k_descale=k_descale if self.vllm_flash_attn_version == 3 else None,
                     v_descale=v_descale if self.vllm_flash_attn_version == 3 else None,
-                    num_splits=attn_metadata.max_num_splits,
+                    num_splits=attn_metadata.max_num_splits if self.vllm_flash_attn_version != 2 else 0,
                     s_aux=self.sinks,
                 )
                 return output

@@ -381,9 +381,9 @@ class Attention(nn.Module, AttentionLayerBase):
 
         # for attn backends supporting query quantization
         self.query_quant = None
-        if self.impl.supports_quant_query_input and self.kv_cache_dtype.startswith(
-            "fp8"
-        ):
+        if self.impl.supports_quant_query_input and self.kv_cache_dtype in {
+            "fp8", "fp8_e4m3"
+        }:
             is_per_head = (
                 hasattr(self, "q_scale") and self.q_scale.numel() == self.num_kv_heads
             )
