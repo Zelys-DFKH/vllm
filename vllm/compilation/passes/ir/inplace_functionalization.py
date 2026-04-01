@@ -66,13 +66,16 @@ class VllmIRInplaceFunctionalizationPass(VllmInductorPass):
                 arg = node.args[arg_idx]
                 assert isinstance(arg, fx.Node), "Activation inputs must be fx.Node"
                 for user in arg.users:
-                    if user is not node:
-                        # TODO(luka) only check topologically?
-                        logger.warning(
-                            "Node %s (input to %s) has another use", arg, node
+                    if node_to_idx[user] > node_to_idx[node]:
+                        raise ValueError(
+                            f"Input {arg} to maybe_inplace node {node} "
+                            f"is used again after the node. "
+                            f"This is not allowed; activation inputs to maybe_inplace "
+                            f"ops are donated to the op, meaning their memory may be "
+                            f"recycled for outputs.\n\n"
+                            f"To preserve the inputs, use the default overload or "
+                            f"clone them manually beforehand."
                         )
-                        # TODO raise error, this is undefined behavior.
-                        #  Use default overload to keep activation inputs.
 
                 if arg.op == "placeholder":
                     # Graph input that maybe_inplace might modify.
